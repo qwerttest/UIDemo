@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.QMUIDemo">
-        <activity android:name="com.wj.uidemo.MainActivity">
+        <activity android:name="com.wj.uidemo.qmui.QMUIActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
