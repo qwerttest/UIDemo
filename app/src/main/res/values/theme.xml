@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="app_skin_span_normal_text_color" format="color"/>
+    <attr name="app_skin_span_pressed_text_color" format="color"/>
+    <attr name="app_skin_span_normal_bg_color" format="color"/>
+    <attr name="app_skin_span_pressed_bg_color" format="color"/>
+</resources>
