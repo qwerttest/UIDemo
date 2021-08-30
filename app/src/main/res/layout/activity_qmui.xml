@@ -1,10 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#666666"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <TextView
+            android:id="@+id/btn1"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:text="置0"/>
+
+        <TextView
+            android:id="@+id/btn2"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:text="恢复"/>
+
+        <TextView
+            android:id="@+id/btn3"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:text="滚动到顶"/>
+    </LinearLayout>
 
     <com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedScrollLayout
         android:id="@+id/coordinator"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-</FrameLayout>
+</LinearLayout>

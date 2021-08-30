@@ -1,20 +1,18 @@
 package com.wj.uidemo.qmui
 
-import android.graphics.Color
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.Spanned
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomAreaBehavior
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedTopAreaBehavior
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedTopDelegateLayout
-import com.qmuiteam.qmui.span.QMUITouchableSpan
+import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedTopRecyclerView
 import com.wj.qmuidemo.R
 import kotlinx.android.synthetic.main.activity_qmui.*
+import java.util.*
 
 /**
  * Des
@@ -22,30 +20,71 @@ import kotlinx.android.synthetic.main.activity_qmui.*
  * */
 class QMUIActivity : AppCompatActivity() {
     private var mTopDelegateLayout: QMUIContinuousNestedTopDelegateLayout? = null
+    private var mTopRecyclerView: QMUIContinuousNestedTopRecyclerView? = null
+    private var topAdapter: TopAdapter? = null
+    private var bottomView: QMUIBottomView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_qmui)
         initTop()
+        initBottom()
+        initListener()
+        onDataLoaded()
+    }
+
+    private fun initListener(){
+        btn1.setOnClickListener {
+            bottomView?.hideSticky()
+        }
+
+        btn2.setOnClickListener {
+            bottomView?.showSticky()
+        }
+
+        btn3.setOnClickListener {
+            coordinator.scrollBottomViewToTop()
+        }
+    }
+
+    private fun initBottom() {
+        bottomView = QMUIBottomView(this)
+        val matchParent = ViewGroup.LayoutParams.MATCH_PARENT
+        val recyclerViewLp: CoordinatorLayout.LayoutParams = CoordinatorLayout.LayoutParams(matchParent, matchParent)
+        recyclerViewLp.behavior = QMUIContinuousNestedBottomAreaBehavior()
+        coordinator.setBottomAreaView(bottomView, recyclerViewLp)
     }
 
     private fun initTop(){
         mTopDelegateLayout = QMUIContinuousNestedTopDelegateLayout(this)
-        val tv = TextView(this)
-        tv.text = "这是第一个头部View"
-        tv.textSize = 18f
-        tv.setBackgroundResource(R.color.qmui_config_color_50_blue)
-        mTopDelegateLayout?.addView(tv, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100))
+        mTopRecyclerView = QMUIContinuousNestedTopRecyclerView(this)
+        mTopRecyclerView!!.layoutManager = object : LinearLayoutManager(this) {
+            override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
+                return RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT)
+            }
+        }
+        mTopRecyclerView?.let {
+            mTopDelegateLayout?.delegateView = it
+        }
 
-        val tvBottom = TextView(this)
-        tvBottom.text = "这是第一个底部View"
-        tvBottom.textSize = 18f
-        tv.setBackgroundResource(R.color.qmui_config_color_gray_1)
-        mTopDelegateLayout?.addView(tvBottom, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100))
+        topAdapter = TopAdapter()
+        mTopRecyclerView?.adapter = topAdapter
 
         val matchParent = ViewGroup.LayoutParams.MATCH_PARENT
         val topLp = CoordinatorLayout.LayoutParams(matchParent, matchParent)
         topLp.behavior = QMUIContinuousNestedTopAreaBehavior(this)
         coordinator.setTopAreaView(mTopDelegateLayout, topLp)
+    }
+
+    private fun onDataLoaded() {
+        val data: List<String> = ArrayList(Arrays.asList("Helps", "Maintain", "Liver",
+                "Health", "Function", "Supports", "Healthy", "Fat", "Metabolism", "Nuturally",
+                "Bracket", "Refrigerator", "Bathtub", "Wardrobe", "Comb", "Apron", "Carpet",
+                "Bolster", "Pillow", "Cushion"))
+        Collections.shuffle(data)
+        topAdapter?.replaceData(data)
+
+        bottomView?.loadData()
     }
 }
