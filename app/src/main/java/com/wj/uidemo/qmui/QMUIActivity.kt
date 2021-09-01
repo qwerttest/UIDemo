@@ -54,6 +54,7 @@ class QMUIActivity : AppCompatActivity() {
         bottomView?.setBottomActionListener(object : QMUIBottomView.OnBottomActionListener{
             override fun scrollBottomViewToTop() {
                 coordinator.scrollBottomViewToTop()
+                selectView.show()
             }
         })
     }

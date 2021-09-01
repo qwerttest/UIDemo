@@ -14,9 +14,9 @@ import com.qmuiteam.qmui.nestedScroll.IQMUIContinuousNestedBottomView
 import com.qmuiteam.qmui.nestedScroll.IQMUIContinuousNestedScrollCommon.OnScrollNotifier
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomDelegateLayout
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomRecyclerView
-import com.qmuiteam.qmui.util.QMUIDisplayHelper
 import com.qmuiteam.qmui.widget.QMUIPagerAdapter
 import com.wj.qmuidemo.R
+import com.wj.uidemo.utils.dp
 import com.wj.uidemo.widget.ScrollViewPager
 import java.util.*
 
@@ -28,7 +28,7 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
 
     private var mViewPager: MyViewPager? = null
     private var mCurrentItemView: QMUIContinuousNestedBottomRecyclerView? = null
-    private var stickyHeight: Int = QMUIDisplayHelper.dp2px(context, 50)
+    private var stickyHeight: Int = 50.dp
     private var headerHeight: Int = 0
     private var tab1: TextView? = null
     private var tab2: TextView? = null
@@ -60,7 +60,8 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
                     }
                 }
                 val adapter = TopAdapter()
-                adapter.setOnItemClickListener { _, _, position -> Toast.makeText(context, "click position=$position", Toast.LENGTH_SHORT).show()
+                adapter.setOnItemClickListener { _, _, position ->
+                    Toast.makeText(context, "click position=$position", Toast.LENGTH_SHORT).show()
                     onDataLoaded(adapter)
                 }
                 recyclerView.adapter = adapter
@@ -101,7 +102,6 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
      * 修改为这样后，如果viewpager某个item高度不够时也会充满全屏
      * */
     override fun getContentHeight(): Int {
-        println("this@QMUIBottomView.height = ${this@QMUIBottomView.height}")
         return this@QMUIBottomView.height
     }
 
@@ -110,7 +110,7 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
     }
 
     override fun getHeaderHeightLayoutParam(): Int {
-        return if(headerHeight == 0) QMUIDisplayHelper.dp2px(context, 50) else headerHeight
+        return if (headerHeight == 0) 50.dp else headerHeight
     }
 
     fun initHeaderView() {
@@ -119,19 +119,19 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
         secondTab = headerView.findViewById(R.id.secondTab)
 
         tab1?.setOnClickListener {
-            headerHeight = QMUIDisplayHelper.dp2px(context, 50)
+            headerHeight = 50.dp
             secondTab?.visibility = GONE
-            stickyHeight = QMUIDisplayHelper.dp2px(context, 50)
+            stickyHeight = 50.dp
             removeView(headerView)
-            addView( headerView, 0, LayoutParams(LayoutParams.MATCH_PARENT, headerHeightLayoutParam))
+            addView(headerView, 0, LayoutParams(LayoutParams.MATCH_PARENT, headerHeightLayoutParam))
         }
 
         tab2?.setOnClickListener {
-            headerHeight = QMUIDisplayHelper.dp2px(context, 100)
+            headerHeight = 100.dp
             secondTab?.visibility = VISIBLE
-            stickyHeight = QMUIDisplayHelper.dp2px(context, 100)
+            stickyHeight = 100.dp
             removeView(headerView)
-            addView( headerView, 0, LayoutParams(LayoutParams.MATCH_PARENT, headerHeightLayoutParam))
+            addView(headerView, 0, LayoutParams(LayoutParams.MATCH_PARENT, headerHeightLayoutParam))
         }
 
         headerView.findViewById<TextView>(R.id.second_tab4).setOnClickListener {
@@ -140,17 +140,15 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
     }
 
     private fun onDataLoaded(adapter: TopAdapter, short: Boolean = false) {
-        if(short){
+        if (short) {
             val data: List<String> = ArrayList(listOf("Helps", "Maintain", "Liver",
                     "Health", "Function"))
-            Collections.shuffle(data)
             adapter.replaceData(data)
         } else {
             val data: List<String> = ArrayList(listOf("Helps", "Maintain", "Liver",
                     "Health", "Function", "Supports", "Healthy", "Fat", "Metabolism", "Nuturally",
                     "Bracket", "Refrigerator", "Bathtub", "Wardrobe", "Comb", "Apron", "Carpet",
                     "Bolster", "Pillow", "Cushion"))
-            Collections.shuffle(data)
             adapter.replaceData(data)
         }
     }
@@ -161,7 +159,7 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
     }
 
     fun showSticky() {
-        stickyHeight = QMUIDisplayHelper.dp2px(context, 50)
+        stickyHeight = 50.dp
         tab2?.visibility = VISIBLE
     }
 
@@ -215,11 +213,11 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
         const val KEY_CURRENT_POSITION = "demo_bottom_current_position"
     }
 
-    interface OnBottomActionListener{
+    interface OnBottomActionListener {
         fun scrollBottomViewToTop()
     }
 
-    fun setBottomActionListener(listener: OnBottomActionListener){
+    fun setBottomActionListener(listener: OnBottomActionListener) {
         this.bottomActionListener = listener
     }
 }

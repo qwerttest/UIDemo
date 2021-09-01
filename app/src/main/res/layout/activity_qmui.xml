@@ -41,8 +41,21 @@
             android:text="滚动到顶"/>
     </LinearLayout>
 
-    <com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedScrollLayout
-        android:id="@+id/coordinator"
+    <FrameLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+        <com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedScrollLayout
+            android:id="@+id/coordinator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.wj.uidemo.qmui.SelectView
+            android:id="@+id/selectView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="100dp"
+            android:visibility="gone"/>
+    </FrameLayout>
+
 </LinearLayout>
