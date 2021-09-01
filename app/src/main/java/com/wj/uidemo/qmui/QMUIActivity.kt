@@ -6,10 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomAreaBehavior
-import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedTopAreaBehavior
-import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedTopDelegateLayout
-import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedTopRecyclerView
+import com.qmuiteam.qmui.nestedScroll.*
 import com.wj.qmuidemo.R
 import kotlinx.android.synthetic.main.activity_qmui.*
 import java.util.*
@@ -53,6 +50,12 @@ class QMUIActivity : AppCompatActivity() {
         val recyclerViewLp: CoordinatorLayout.LayoutParams = CoordinatorLayout.LayoutParams(matchParent, matchParent)
         recyclerViewLp.behavior = QMUIContinuousNestedBottomAreaBehavior()
         coordinator.setBottomAreaView(bottomView, recyclerViewLp)
+
+        bottomView?.setBottomActionListener(object : QMUIBottomView.OnBottomActionListener{
+            override fun scrollBottomViewToTop() {
+                coordinator.scrollBottomViewToTop()
+            }
+        })
     }
 
     private fun initTop(){
@@ -84,7 +87,5 @@ class QMUIActivity : AppCompatActivity() {
                 "Bolster", "Pillow", "Cushion"))
         Collections.shuffle(data)
         topAdapter?.replaceData(data)
-
-        bottomView?.loadData()
     }
 }
