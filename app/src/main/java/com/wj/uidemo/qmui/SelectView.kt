@@ -17,6 +17,7 @@ import java.util.*
 class SelectView @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : LinearLayout(context, attrs, defStyleAttr) {
 
     init {
+        setBackgroundColor(0x99000000.toInt())
         LayoutInflater.from(context).inflate(R.layout.activity_qmui_selectview, this, true)
         selectViewRv.layoutManager = LinearLayoutManager(context)
         val adapter = TopAdapter()
