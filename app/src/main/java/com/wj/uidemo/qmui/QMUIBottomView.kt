@@ -10,16 +10,14 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
-import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomDelegateLayout
 import com.wj.qmuidemo.R
 import com.wj.uidemo.utils.dp
-import java.util.*
 
 /**
  * Des
  * @author WangJian on 2021/8/27 17
  * */
-class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : QMUIContinuousNestedBottomDelegateLayout(context, attrs, defStyleAttr) {
+class QMUIBottomView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : MBottomView(context, attrs, defStyleAttr) {
 
     private var stickyHeight: Int = 50.dp
     private var headerHeight: Int = 0
@@ -28,60 +26,12 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
     private var tab2: TextView? = null
     private var secondTab: View? = null
     //header
-    //content
-    private var mViewPager: MViewPager? = null
-    //content
+
     private var bottomActionListener: OnBottomActionListener? = null
 
-    init {
-        initHeaderView()
-    }
+    override fun initHeaderView(): View {
+        val headerView = LayoutInflater.from(context).inflate(R.layout.activity_qmui_headerview, null)
 
-    override fun onCreateHeaderView(): View {
-        return LayoutInflater.from(context).inflate(R.layout.activity_qmui_headerview, null)
-    }
-
-    override fun onCreateContentView(): View {
-        mViewPager = MViewPager(context)
-        val list = mutableListOf<BottomWidgetItemView>()
-        list.add(generateComp0())
-        list.add(generateViewPager())
-        mViewPager?.adapter = MQMUIPagerAdapter(list)
-
-        mViewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            }
-
-            override fun onPageSelected(position: Int) {
-                if(position == 0){
-                    tab1?.performClick()
-                } else if(position == 1){
-                    tab2?.performClick()
-                }
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-            }
-        })
-        return mViewPager as MViewPager
-    }
-
-    /**
-     * 修改为这样后，如果viewpager某个item高度不够时也会充满全屏
-     * */
-    override fun getContentHeight(): Int {
-        return this@QMUIBottomView.height
-    }
-
-    override fun getHeaderStickyHeight(): Int {
-        return stickyHeight
-    }
-
-    override fun getHeaderHeightLayoutParam(): Int {
-        return if (headerHeight == 0) 50.dp else headerHeight
-    }
-
-    private fun initHeaderView() {
         tab1 = headerView.findViewById(R.id.tab1)
         tab2 = headerView.findViewById(R.id.tab2)
         secondTab = headerView.findViewById(R.id.secondTab)
@@ -105,7 +55,42 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
         headerView.findViewById<TextView>(R.id.second_tab4).setOnClickListener {
             bottomActionListener?.scrollBottomViewToTop()
         }
+        return headerView
     }
+
+    override fun initContentViews(): List<BottomWidgetItemView> {
+        val list = mutableListOf<BottomWidgetItemView>()
+        list.add(generateComp0())
+        list.add(generateViewPager())
+        return list
+    }
+
+    override fun doViewPager(viewpager: MViewPager?){
+        viewpager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            }
+
+            override fun onPageSelected(position: Int) {
+                if(position == 0){
+                    tab1?.performClick()
+                } else if(position == 1){
+                    tab2?.performClick()
+                }
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+            }
+        })
+    }
+
+    override fun getHeaderStickyHeight(): Int {
+        return stickyHeight
+    }
+
+    override fun getHeaderHeightLayoutParam(): Int {
+        return if (headerHeight == 0) 50.dp else headerHeight
+    }
+
 
     private fun onDataLoaded(adapter: TopAdapter, short: Boolean = false) {
         if (short) {
