@@ -1,7 +1,6 @@
 package com.wj.uidemo.qmui
 
 import android.content.Context
-import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -10,14 +9,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.qmuiteam.qmui.nestedScroll.IQMUIContinuousNestedBottomView
-import com.qmuiteam.qmui.nestedScroll.IQMUIContinuousNestedScrollCommon.OnScrollNotifier
+import androidx.viewpager.widget.ViewPager
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomDelegateLayout
-import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomRecyclerView
-import com.qmuiteam.qmui.widget.QMUIPagerAdapter
 import com.wj.qmuidemo.R
 import com.wj.uidemo.utils.dp
-import com.wj.uidemo.widget.ScrollViewPager
 import java.util.*
 
 /**
@@ -26,17 +21,17 @@ import java.util.*
  * */
 class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : QMUIContinuousNestedBottomDelegateLayout(context, attrs, defStyleAttr) {
 
-    private var mViewPager: MyViewPager? = null
-    private var mCurrentItemView: QMUIContinuousNestedBottomRecyclerView? = null
     private var stickyHeight: Int = 50.dp
     private var headerHeight: Int = 0
+    //header
     private var tab1: TextView? = null
     private var tab2: TextView? = null
-    private var mCurrentPosition = -1
     private var secondTab: View? = null
+    //header
+    //content
+    private var mViewPager: MViewPager? = null
+    //content
     private var bottomActionListener: OnBottomActionListener? = null
-
-    private var mOnScrollNotifier: OnScrollNotifier? = null
 
     init {
         initHeaderView()
@@ -47,55 +42,28 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
     }
 
     override fun onCreateContentView(): View {
-        mViewPager = MyViewPager(context)
+        mViewPager = MViewPager(context)
+        val list = mutableListOf<BottomWidgetItemView>()
+        list.add(generateComp0())
+        list.add(generateViewPager())
+        mViewPager?.adapter = MQMUIPagerAdapter(list)
 
-        var count = 0
-        mViewPager?.adapter = object : QMUIPagerAdapter() {
-            override fun hydrate(container: ViewGroup, position: Int): Any {
-                val recyclerView = QMUIContinuousNestedBottomRecyclerView(context)
-                recyclerView.layoutManager = object : LinearLayoutManager(context) {
-                    override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
-                        return RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.MATCH_PARENT)
-                    }
-                }
-                val adapter = TopAdapter()
-                adapter.setOnItemClickListener { _, _, position ->
-                    Toast.makeText(context, "click position=$position", Toast.LENGTH_SHORT).show()
-                    onDataLoaded(adapter)
-                }
-                recyclerView.adapter = adapter
-                onDataLoaded(adapter, count > 0)
-                count++
-                return recyclerView
+        mViewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
             }
 
-            override fun populate(container: ViewGroup, item: Any, position: Int) {
-                container.addView(item as View)
-            }
-
-            override fun destroy(container: ViewGroup, position: Int, `object`: Any) {
-                container.removeView(`object` as View)
-            }
-
-            override fun getCount(): Int {
-                return 2
-            }
-
-            override fun isViewFromObject(view: View, o: Any): Boolean {
-                return view === o
-            }
-
-            override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
-                super.setPrimaryItem(container, position, `object`)
-                mCurrentItemView = `object` as QMUIContinuousNestedBottomRecyclerView
-                mCurrentPosition = position
-                if (mOnScrollNotifier != null) {
-                    mCurrentItemView?.injectScrollNotifier(mOnScrollNotifier)
+            override fun onPageSelected(position: Int) {
+                if(position == 0){
+                    tab1?.performClick()
+                } else if(position == 1){
+                    tab2?.performClick()
                 }
             }
-        }
-        return mViewPager as MyViewPager
+
+            override fun onPageScrollStateChanged(state: Int) {
+            }
+        })
+        return mViewPager as MViewPager
     }
 
     /**
@@ -113,7 +81,7 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
         return if (headerHeight == 0) 50.dp else headerHeight
     }
 
-    fun initHeaderView() {
+    private fun initHeaderView() {
         tab1 = headerView.findViewById(R.id.tab1)
         tab2 = headerView.findViewById(R.id.tab2)
         secondTab = headerView.findViewById(R.id.secondTab)
@@ -159,58 +127,8 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
     }
 
     fun showSticky() {
-        stickyHeight = 50.dp
+        stickyHeight = headerHeight
         tab2?.visibility = VISIBLE
-    }
-
-    internal inner class MyViewPager(context: Context?) : ScrollViewPager(context), IQMUIContinuousNestedBottomView {
-
-        override fun consumeScroll(dyUnconsumed: Int) {
-            mCurrentItemView?.consumeScroll(dyUnconsumed)
-        }
-
-        override fun smoothScrollYBy(dy: Int, duration: Int) {
-            mCurrentItemView?.smoothScrollYBy(dy, duration)
-        }
-
-        override fun stopScroll() {
-            mCurrentItemView?.stopScroll()
-        }
-
-        override fun getContentHeight(): Int {
-            return mCurrentItemView?.contentHeight ?: 0
-        }
-
-        override fun getCurrentScroll(): Int {
-            return mCurrentItemView?.currentScroll ?: 0
-        }
-
-        override fun getScrollOffsetRange(): Int {
-            return mCurrentItemView?.scrollOffsetRange ?: height
-        }
-
-        override fun injectScrollNotifier(notifier: OnScrollNotifier) {
-            mOnScrollNotifier = notifier
-            mCurrentItemView?.injectScrollNotifier(notifier)
-        }
-
-        override fun saveScrollInfo(bundle: Bundle) {
-            bundle.putInt(KEY_CURRENT_POSITION, mCurrentPosition)
-            mCurrentItemView?.saveScrollInfo(bundle)
-        }
-
-        override fun restoreScrollInfo(bundle: Bundle) {
-            if (mCurrentItemView != null) {
-                val currentPos = bundle.getInt(KEY_CURRENT_POSITION, -1)
-                if (currentPos == mCurrentPosition) {
-                    mCurrentItemView?.restoreScrollInfo(bundle)
-                }
-            }
-        }
-    }
-
-    companion object {
-        const val KEY_CURRENT_POSITION = "demo_bottom_current_position"
     }
 
     interface OnBottomActionListener {
@@ -219,5 +137,34 @@ class QMUIBottomView @JvmOverloads constructor(context: Context? = null, attrs: 
 
     fun setBottomActionListener(listener: OnBottomActionListener) {
         this.bottomActionListener = listener
+    }
+
+    private fun generateComp0(): BottomWidgetItemView{
+        val recyclerView = MContinuousNestedBottomRecyclerView(context)
+        recyclerView.layoutManager = object : LinearLayoutManager(context) {
+            override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
+                return RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT)
+            }
+        }
+        val adapter = TopAdapter()
+        adapter.setOnItemClickListener { _, _, position ->
+            Toast.makeText(context, "click position=$position", Toast.LENGTH_SHORT).show()
+            onDataLoaded(adapter)
+        }
+        recyclerView.adapter = adapter
+        onDataLoaded(adapter)
+        return recyclerView
+    }
+
+    private fun generateViewPager() : BottomWidgetItemView{
+        val viewPager = MViewPager(context)
+
+        val list = mutableListOf<BottomWidgetItemView>()
+        list.add(generateComp0())
+        list.add(generateComp0())
+        viewPager?.adapter = MQMUIPagerAdapter(list)
+
+        return viewPager
     }
 }
