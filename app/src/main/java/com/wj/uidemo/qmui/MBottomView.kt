@@ -3,24 +3,38 @@ package com.wj.uidemo.qmui
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import com.qmuiteam.qmui.nestedScroll.IQMUIContinuousNestedScrollCommon
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomDelegateLayout
 
 /**
  * Des 抽象出通用BottomView控件
  * @author WangJian on 2021/9/3 11
  * */
-abstract class MBottomView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : QMUIContinuousNestedBottomDelegateLayout(context, attrs, defStyleAttr)  {
+abstract class MBottomView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : QMUIContinuousNestedBottomDelegateLayout(context, attrs, defStyleAttr) {
     //content
     private var mViewPager: MViewPager? = null
+    private var mOnScrollNotifier: IQMUIContinuousNestedScrollCommon.OnScrollNotifier? = null
+    private val mOnScrollNotifierListener = object : MViewPager.OnScrollNotifierListener {
+        override fun setScrollNotifier(scrollNotifier: IQMUIContinuousNestedScrollCommon.OnScrollNotifier?) {
+            mOnScrollNotifier = scrollNotifier
+        }
+    }
     //content
+
+    private val primaryItemListener = object : MQMUIPagerAdapter.PrimaryItemListener {
+        override fun setPrimaryItem(itemViewBase: BottomWidgetItemView?, currentPosition: Int) {
+            itemViewBase?.injectScrollNotifier(mOnScrollNotifier)
+            onPrimaryItem(itemViewBase, currentPosition)
+        }
+    }
 
     final override fun onCreateHeaderView(): View {
         return initHeaderView()
     }
 
     final override fun onCreateContentView(): View {
-        mViewPager = MViewPager(context)
-        mViewPager?.adapter = MQMUIPagerAdapter(initContentViews())
+        mViewPager = MViewPager(context, scrollNotifierListener = mOnScrollNotifierListener)
+        mViewPager?.adapter = MQMUIPagerAdapter(initContentViews(), listener = primaryItemListener)
         doViewPager(mViewPager)
         return mViewPager as MViewPager
     }
@@ -40,6 +54,12 @@ abstract class MBottomView @JvmOverloads constructor(context: Context, attrs: At
     /**
      * 在此处对content(ViewPager进行自定义处理)
      * */
-    protected open fun doViewPager(viewPager: MViewPager?){
+    protected open fun doViewPager(viewPager: MViewPager?) {
+    }
+
+    /**
+     * ContentView内容页发生了变化，viewPager第一次初始化内容时也会调用
+     */
+    protected open fun onPrimaryItem(itemViewBase: BottomWidgetItemView?, currentPosition: Int) {
     }
 }

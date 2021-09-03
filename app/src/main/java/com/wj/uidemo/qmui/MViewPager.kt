@@ -4,21 +4,20 @@ import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
 import androidx.viewpager.widget.PagerAdapter
-import com.qmuiteam.qmui.nestedScroll.IQMUIContinuousNestedScrollCommon
+import com.qmuiteam.qmui.nestedScroll.IQMUIContinuousNestedScrollCommon.OnScrollNotifier
 import com.qmuiteam.qmui.widget.QMUIViewPager
 
 /**
  * Des 仅适用于QMUI模板
  * @author WangJian on 2021/09/02 18
  * */
-class MViewPager @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null) : QMUIViewPager(context, attrs), BottomWidgetItemView {
+class MViewPager @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null, private var scrollNotifierListener: OnScrollNotifierListener? = null) : QMUIViewPager(context, attrs), BottomWidgetItemView {
 
     companion object {
         const val KEY_CURRENT_POSITION = "demo_bottom_current_position"
     }
 
     private var myQMUIPagerAdapter: MQMUIPagerAdapter? = null
-    private var mOnScrollNotifier: IQMUIContinuousNestedScrollCommon.OnScrollNotifier? = null
 
     override fun setAdapter(adapter: PagerAdapter?) {
         super.setAdapter(adapter)
@@ -49,8 +48,8 @@ class MViewPager @JvmOverloads constructor(context: Context?, attrs: AttributeSe
         return myQMUIPagerAdapter?.getCurrentItemView()?.scrollOffsetRange ?: height
     }
 
-    override fun injectScrollNotifier(notifier: IQMUIContinuousNestedScrollCommon.OnScrollNotifier) {
-        mOnScrollNotifier = notifier
+    override fun injectScrollNotifier(notifier: OnScrollNotifier) {
+        scrollNotifierListener?.setScrollNotifier(notifier)
         myQMUIPagerAdapter?.getCurrentItemView()?.injectScrollNotifier(notifier)
     }
 
@@ -73,4 +72,8 @@ class MViewPager @JvmOverloads constructor(context: Context?, attrs: AttributeSe
     }
 
     private fun getCurrentPosition(): Int = myQMUIPagerAdapter?.getCurrentPosition() ?: -1
+
+    interface OnScrollNotifierListener {
+        fun setScrollNotifier(scrollNotifier: OnScrollNotifier?)
+    }
 }
