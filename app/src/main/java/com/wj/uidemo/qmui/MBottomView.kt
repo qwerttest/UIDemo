@@ -2,6 +2,7 @@ package com.wj.uidemo.qmui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import com.qmuiteam.qmui.nestedScroll.IQMUIContinuousNestedScrollCommon
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomDelegateLayout
@@ -14,27 +15,24 @@ abstract class MBottomView @JvmOverloads constructor(context: Context, attrs: At
     //content
     private var mViewPager: MViewPager? = null
     private var mOnScrollNotifier: IQMUIContinuousNestedScrollCommon.OnScrollNotifier? = null
-    private val mOnScrollNotifierListener = object : MViewPager.OnScrollNotifierListener {
-        override fun setScrollNotifier(scrollNotifier: IQMUIContinuousNestedScrollCommon.OnScrollNotifier?) {
-            mOnScrollNotifier = scrollNotifier
-        }
-    }
     //content
-
-    private val primaryItemListener = object : MQMUIPagerAdapter.PrimaryItemListener {
-        override fun setPrimaryItem(itemViewBase: BottomWidgetItemView?, currentPosition: Int) {
-            itemViewBase?.injectScrollNotifier(mOnScrollNotifier)
-            onPrimaryItem(itemViewBase, currentPosition)
-        }
-    }
 
     final override fun onCreateHeaderView(): View {
         return initHeaderView()
     }
 
     final override fun onCreateContentView(): View {
-        mViewPager = MViewPager(context, scrollNotifierListener = mOnScrollNotifierListener)
-        mViewPager?.adapter = MQMUIPagerAdapter(initContentViews(), listener = primaryItemListener)
+        mViewPager = MViewPager(context, scrollNotifierListener = object : MViewPager.OnScrollNotifierListener {
+            override fun setScrollNotifier(scrollNotifier: IQMUIContinuousNestedScrollCommon.OnScrollNotifier?) {
+                mOnScrollNotifier = scrollNotifier
+            }
+        })
+        mViewPager?.adapter = MQMUIPagerAdapter(initContentViews(), listener = object : MQMUIPagerAdapter.PrimaryItemListener {
+            override fun setPrimaryItem(itemViewBase: BottomWidgetItemView?, currentPosition: Int) {
+                itemViewBase?.injectScrollNotifier(mOnScrollNotifier)
+                onPrimaryItem(itemViewBase, currentPosition)
+            }
+        })
         doViewPager(mViewPager)
         return mViewPager as MViewPager
     }
@@ -44,6 +42,11 @@ abstract class MBottomView @JvmOverloads constructor(context: Context, attrs: At
      * */
     override fun getContentHeight(): Int {
         return this@MBottomView.height
+    }
+
+    override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
+//       return super.onInterceptTouchEvent(event);
+        return false
     }
 
 
